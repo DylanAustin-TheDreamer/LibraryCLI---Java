@@ -248,6 +248,11 @@ public class Application {
                 // code block
                 this.startApplication();
                 break;
+            default:
+                // code block
+                System.out.println("---");
+                System.out.println("Refer to options and try again...");
+                this.startApplication();
         }
     }
     public void Exit() {
