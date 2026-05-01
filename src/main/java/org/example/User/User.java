@@ -22,4 +22,7 @@ public class User {
     public String getBookIndex() {
         return this.bookIndex;
     }
+    public void setBookIndex(String bookIndex) {
+        this.bookIndex = bookIndex;
+    }
 }

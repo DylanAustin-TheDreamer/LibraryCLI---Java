@@ -64,4 +64,32 @@ public class Book {
             return "Book ID: " + this.storeId + "\n" + "Loaned to: " + this.loaner + "\n" + Arrays.toString(bookDetails);
         } else return "Book ID: " + this.storeId + "\n" + Arrays.toString(bookDetails);
     }
+
+    public Integer getStoreId() {
+        return storeId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public String getSubGenre() {
+        return subGenre;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public String getLoaner() {
+        return loaner;
+    }
 }

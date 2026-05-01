@@ -12,8 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
-import static org.example.Database.DatabaseUtilities.saveUsers;
-import static org.example.Database.DatabaseUtilities.updateExistingUsers;
+import static org.example.Database.DatabaseUtilities.*;
 
 public class Application {
     Database database;
@@ -36,6 +35,7 @@ public class Application {
         // check account
         if (user != null) {
             System.out.println("User: " + user.getName());
+            System.out.println("Press *: User Account");
             System.out.println(" ");
         } else if (admin != null){
             System.out.println("Admin: " + admin.getName());
@@ -104,7 +104,7 @@ public class Application {
         String password = scannerInput;
         for (User users : this.userDatabase.getUserDatabase()) {
             if(username.toLowerCase().equals(users.getName().toLowerCase()) && password.toLowerCase().equals(users.getPassword().toLowerCase())) {
-                this.user = new User(users.getName(), users.getPassword(), null, false);
+                this.user = new User(users.getName(), users.getPassword(), users.getBookIndex(), false);
                 this.startApplication();
             }
         }
@@ -159,6 +159,10 @@ public class Application {
                 // code block
                 this.Exit();
                 break;
+            case "*":
+                // code block
+                UserDashboard();
+                break;
             default:
                 // code block
                 System.out.println("---");
@@ -185,9 +189,6 @@ public class Application {
                 }
                 System.out.println(returnedTitleBook.getBookDetails());
                 System.out.println(" ");
-
-                // This section below is not working - and it is the simplest code I have - Edit: solved
-                // Needed this in both title search and index search lol!
                 if(!returnedTitleBook.isLoaned()) {
                     if (user != null) {
                         System.out.println("Press 1: Loan");
@@ -201,6 +202,13 @@ public class Application {
                     if (user != null) {
                         System.out.println(" ");
                         this.database.setDatabaseBookToLoan(Integer.parseInt(String.valueOf(returnedTitleBook.getIndex())), user.getName());
+                        try {
+                            updateExistingUsers(user.getName(), returnedTitleBook.getIndex());
+                            this.user.setBookIndex(String.valueOf(returnedTitleBook.getIndex()));
+                            Library();
+                        } catch (IOException | CsvException e){
+                            throw new RuntimeException(e);
+                        }
                     } else this.Library();
                 } else {
                     this.Library();
@@ -236,6 +244,8 @@ public class Application {
                         this.database.setDatabaseBookToLoan(returnedIndexBook.getIndex(), user.getName());
                         try {
                             updateExistingUsers(user.getName(), returnedIndexBook.getIndex());
+                            this.user.setBookIndex(String.valueOf(returnedIndexBook.getIndex()));
+                            Library();
                         } catch (IOException | CsvException e){
                             throw new RuntimeException(e);
                         }
@@ -265,12 +275,72 @@ public class Application {
                 // code block
                 this.startApplication();
                 break;
+            case "*":
+                // code block
+                if (admin != null){
+                    AdminDashboard();
+                }
+                break;
             default:
                 // code block
                 System.out.println("---");
                 System.out.println("Refer to options and try again...");
                 this.startApplication();
         }
+    }
+    // Extra details for users and Admin
+    public void UserDashboard() {
+        System.out.println("---");
+        System.out.println("Welcome " + user.getName());
+        System.out.println(" ");
+        System.out.println("Books you have loaned (only one book can be loaned whilst we improve our services): ");
+        String index = user.getBookIndex();
+        Book book = database.getSpecific(index);
+        if (book != null) {
+            System.out.println(book.getBookDetails());
+        } else System.out.println("You do not currently have any books on loan");
+        System.out.println(" ");
+        System.out.println("Press Enter: Back");
+        Scanner scanner = new Scanner(System.in);
+        scannerInput = scanner.nextLine();
+        startApplication();
+    }
+    public void AdminDashboard() {
+        System.out.println("---");
+        System.out.println("Okay volunteer, we got some labor for you that no one else wants to do...");
+        System.out.println("We need you to go through every single book in the database, and check which books are loaned out and which are not");
+        System.out.println("After which, we need you to write down a log of every book that is out on loan, and how many times these books have been loaned");
+        System.out.println("If you need any further guidance, please refer to the worker's hand book or email HR to raise your concerns");
+        System.out.println("We're.... currently busy... We trust you will be fine on your own...");
+        System.out.println(" ");
+        System.out.println("Press 1: Go through 120 books");
+        Scanner scanner = new Scanner(System.in);
+        scannerInput = scanner.nextLine();
+        if (String.valueOf(scannerInput).equals("1")) {
+            for (Book book : database.getDatabase()){
+                if (book.isLoaned()){
+                    System.out.println(" ");
+                    System.out.println(book.getBookDetails());
+                }
+            }
+            System.out.println(" ");
+            System.out.println("Press 2: Write your logs and sign out for coffee break");
+            scannerInput = scanner.nextLine();
+            if (String.valueOf(scannerInput).equals("2")) {
+                for (Book book : database.getDatabase()){
+                    if (book.isLoaned()) {
+                        try {
+                            logLoanedBooks(String.valueOf(book.getStoreId()), book.getTitle(), book.getAuthor(), book.getGenre(), book.getSubGenre(), book.getPublisher(), book.getLoaner());
+                        } catch (IOException e){
+                            System.out.println(" ");
+                            System.out.println("The Logging function has not worked!");
+                            Library();
+                        }
+                    }
+                }
+                startApplication();
+            } else Library();
+        } else Library();
     }
     public void Exit() {
         System.exit(0);

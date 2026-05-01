@@ -124,8 +124,42 @@ public class DatabaseUtilities {
         writer.flush();
         writer.close();
     }
+    //Number,Title,Author,Genre,SubGenre,Publisher
+    public static void logLoanedBooks(String number, String title, String author, String genre, String subGenre, String publisher, String loaner) throws IOException {
+        File file = new File("src/main/java/org/example/User/admin_logs_data.csv");
+        try {
+            FileReader fileReader = new FileReader(file);
+            FileWriter fw = new FileWriter(file, true);
+
+            // create CSVWriter object filewriter object as parameter
+            CSVWriter writer = new CSVWriter(fw);
+            // add data to csv
+            String[] data1 = {number, title, author, genre, subGenre, publisher, loaner};
+            // ignore the yellow squigglies - doesn't know what it's talking about. Tried its solution and it doesn't work
+            writer.writeNext(data1);
+            // closing writer connection
+            writer.close();
+            fw.close();
+        }
+        catch (IOException e) {
+            // create FileWriter object with file as parameter
+            FileWriter outputfile = new FileWriter(file);
+
+            // create CSVWriter object filewriter object as parameter
+            CSVWriter writer = new CSVWriter(outputfile);
+
+            // adding header to csv
+            String[] header = {"Number", "Title", "Author", "Genre", "SubGenre", "Publisher", "Loaner"};
+            writer.writeNext(header);
+
+            // add data to csv
+            String[] data1 = {number, title, author, genre, subGenre, publisher, loaner};
+            writer.writeNext(data1);
+            // closing writer connection
+            writer.close();
+        }
+    }
     public static int returnIndexCSVBody(List<String[]> csvBody, String name){
-        char quotes = '"';
         for (int i = 1; i < csvBody.size(); i++){
             String[] row = csvBody.get(i);
             if (name.equals(row[0].trim())){
