@@ -19,18 +19,21 @@ public class CSVModel {
     private String subGenre;
     @CsvBindByName(column = "Publisher", required = true)
     private String publisher;
+    @CsvBindByName (column = "Times Loaned", required = false)
+    private Integer timesLoaned;
 
     public CSVModel() {
         // required by OpenCSV
     }
 
-    public CSVModel(Integer storeId, String title, String author, String genre, String subGenre, String publisher){
+    public CSVModel(Integer storeId, String title, String author, String genre, String subGenre, String publisher, Integer timesLoaned){
         this.storeId = storeId;
         this.title = title;
         this.author = author;
         this.genre = genre;
         this.subGenre = subGenre;
         this.publisher = publisher;
+        this.timesLoaned = timesLoaned;
     }
 
     public String getPublisher() {
@@ -55,5 +58,8 @@ public class CSVModel {
 
     public Integer getStoreId() {
         return storeId;
+    }
+    public Integer getTimesLoaned() {
+        return this.timesLoaned;
     }
 }

@@ -20,6 +20,17 @@
 - Go to file path:  src/main/java/org/example/Main.java
 - And run Main.java
 
+# IMPORTANT: The ADMIN mini game:
+
+- To make admin use code: 6767
+- Go to the library and then  admin tools
+- When you are told to press 2, the books_data.csv is going to update with a new header and columns for every single book in the database.
+- Please check database before and after in order to test I have not manually edited books_data.csv by hand.
+- If you do this correctly, books_data.csv will have a header "Times Loaned" for every book. This is how I am keeping consistency for my book data.
+- Admin logs and User data is seperate from books_data.csv. Any other method to handle times books were loaned, would have required extra complexity and handling. I tried this in admin logs instead and it was a terror.
+
+- HAVE FUN!
+
 ---
 ## Notes
 

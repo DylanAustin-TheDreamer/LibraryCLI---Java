@@ -13,8 +13,9 @@ public class Book {
     private String publisher;
     private boolean isLoaned;
     private String loaner;
+    private Integer timesLoaned;
 
-    public Book(Integer storeId, String title, String author, String genre, String subGenre, String publisher, boolean isLoaned, String loaner) {
+    public Book(Integer storeId, String title, String author, String genre, String subGenre, String publisher, boolean isLoaned, String loaner, Integer timesLoaned) {
         this.storeId = storeId;
         this.title = title;
         if(Objects.equals(author, "")){
@@ -25,6 +26,7 @@ public class Book {
         this.publisher = publisher;
         this.isLoaned = isLoaned;
         this.loaner = loaner;
+        this.timesLoaned = timesLoaned;
     }
     // Let's make some search check methods
     public boolean searchTitle(String title){
@@ -43,6 +45,9 @@ public class Book {
     }
     public boolean isLoaned() {
         return this.isLoaned;
+    }
+    public Integer getTimesLoaned() {
+        return this.timesLoaned;
     }
 
     public int getIndex(){

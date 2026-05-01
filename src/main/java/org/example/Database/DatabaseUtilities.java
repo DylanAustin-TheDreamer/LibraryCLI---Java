@@ -10,7 +10,6 @@ import org.example.User.User;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class DatabaseUtilities {
     public DatabaseUtilities(){
@@ -40,7 +39,8 @@ public class DatabaseUtilities {
                     model.getSubGenre(),
                     model.getPublisher(),
                     false,
-                    null
+                    null,
+                    model.getTimesLoaned()
             );
             database.addToDatabase(book);
         }
@@ -60,6 +60,55 @@ public class DatabaseUtilities {
         }
 
         return database;
+    }
+    public static void createNewHeader() throws IOException, CsvException{
+        File inputFile = new File("src/main/java/org/example/Database/books_data.csv");
+        // Read existing file
+        CSVReader reader = new CSVReader(new FileReader(inputFile));
+        List<String[]> csvBody = reader.readAll();
+        // get CSV row column  and replace with by using row and column
+        try {
+            String[] oldHeader = csvBody.get(0);
+
+            // HAD SOME HELP FROM AI - OTHERWISE I WOULD HAVE HAD TO UPDATE BOOKS_DATA MANUALLY
+            // THIS WASN'T ALLOWED IN THE PROJECT BREIF
+            // I'M SORRY - Just learning Java
+
+            // create new header with +1 column
+            String[] newHeader = new String[oldHeader.length + 1];
+            if (newHeader.length > 6) {
+
+                // copy old values
+                System.arraycopy(oldHeader, 0, newHeader, 0, oldHeader.length);
+
+                // add new column name at the end
+                newHeader[oldHeader.length] = "Times Loaned"; // <-- change this
+
+                // replace header row
+                csvBody.set(0, newHeader);
+                for (int i = 1; i < csvBody.size(); i++) {
+                    String[] row = csvBody.get(i);
+
+                    String[] newRow = new String[row.length + 1];
+                    System.arraycopy(row, 0, newRow, 0, row.length);
+
+                    newRow[row.length] = ""; // or some value
+
+                    csvBody.set(i, newRow);
+                }
+                // END OF AI EDIT
+
+                reader.close();
+
+                // Write to CSV file which is open
+                CSVWriter writer = new CSVWriter(new FileWriter(inputFile));
+                writer.writeAll(csvBody);
+                writer.flush();
+                writer.close();
+            } else return;
+        } catch (Exception e){
+            System.out.println("Error adding header and col to books_data.csv");
+        }
     }
     public static void saveUsers(String filePath, String user, String password, String books ) throws IOException {
         File file = new File(filePath);
@@ -108,7 +157,7 @@ public class DatabaseUtilities {
         return userDatabase;
     }
 
-    public static void updateExistingUsers(String name, int bookIndex) throws IOException, CsvException, FileNotFoundException {
+    public static void updateExistingUsers(String name, int bookIndex) throws IOException, CsvException {
         File inputFile = new File("src/main/java/org/example/User/users_data.csv");
 
         // Read existing file
@@ -156,6 +205,40 @@ public class DatabaseUtilities {
             String[] data1 = {number, title, author, genre, subGenre, publisher, loaner};
             writer.writeNext(data1);
             // closing writer connection
+            writer.close();
+        }
+    }
+    public static void logTimesBookLoaned(String name, int bookIndex) throws IOException, CsvException {
+        int counter = 0;
+        File inputFile = new File("src/main/java/org/example/Database/books_data.csv");
+
+        // Read existing file
+        CSVReader reader = new CSVReader(new FileReader(inputFile));
+        List<String[]> csvBody = reader.readAll();
+        // get CSV row column  and replace with by using row and column
+        try {
+
+            int timesLoaned = Integer.parseInt(csvBody.get(returnIndexCSVBody(csvBody, String.valueOf(bookIndex)))[6]);
+            csvBody.get(returnIndexCSVBody(csvBody, String.valueOf(bookIndex)))[6] = String.valueOf(timesLoaned + 1);
+            reader.close();
+
+            // Write to CSV file which is open
+            CSVWriter writer = new CSVWriter(new FileWriter(inputFile));
+            writer.writeAll(csvBody);
+            writer.flush();
+            writer.close();
+            //
+            timesLoaned ++;
+            System.out.println("Book Index: " + name + ": " + "This book has been loaned " + timesLoaned + "times" );
+        } catch (Exception e){
+            // add timesLoaned data for first time
+            System.out.println("Book Index: " + name + ": " + "This book has been loaned for the first time");
+            // Write to CSV file which is open
+            CSVWriter writer = new CSVWriter(new FileWriter(inputFile));
+            csvBody.get(returnIndexCSVBody(csvBody, String.valueOf(bookIndex)))[6] = String.valueOf(counter + 1);
+            reader.close();
+            writer.writeAll(csvBody);
+            writer.flush();
             writer.close();
         }
     }

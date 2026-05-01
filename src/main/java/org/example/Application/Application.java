@@ -321,24 +321,36 @@ public class Application {
                 if (book.isLoaned()){
                     System.out.println(" ");
                     System.out.println(book.getBookDetails());
+                    System.out.println("Times book has been loaned: " + book.getTimesLoaned());
                 }
             }
             System.out.println(" ");
-            System.out.println("Press 2: Write your logs and sign out for coffee break");
+            System.out.println("Press 2: You absolutely must make sure you have added new header and column to books_data.csv");
+            System.out.println("This will help us understand how many times a book has been loaned...");
             scannerInput = scanner.nextLine();
-            if (String.valueOf(scannerInput).equals("2")) {
-                for (Book book : database.getDatabase()){
-                    if (book.isLoaned()) {
-                        try {
-                            logLoanedBooks(String.valueOf(book.getStoreId()), book.getTitle(), book.getAuthor(), book.getGenre(), book.getSubGenre(), book.getPublisher(), book.getLoaner());
-                        } catch (IOException e){
-                            System.out.println(" ");
-                            System.out.println("The Logging function has not worked!");
-                            Library();
+            if(String.valueOf(scannerInput).equals("2")) {
+                try {
+                    createNewHeader();
+                } catch (IOException | CsvException e){
+                    System.out.println(e);
+                }
+                System.out.println("Press 3: Update logs and go for coffee break... you've earned it");
+                scannerInput = scanner.nextLine();
+                if (String.valueOf(scannerInput).equals("3")) {
+                    for (Book book : database.getDatabase()) {
+                        if (book.isLoaned()) {
+                            try {
+                                logLoanedBooks(String.valueOf(book.getStoreId()), book.getTitle(), book.getAuthor(), book.getGenre(), book.getSubGenre(), book.getPublisher(), book.getLoaner());
+                                logTimesBookLoaned(String.valueOf(book.getStoreId()), book.getIndex());
+                            } catch (IOException | CsvException e) {
+                                System.out.println(" ");
+                                System.out.println("The Logging function has not worked!");
+                                Library();
+                            }
                         }
                     }
-                }
-                startApplication();
+                    startApplication();
+                } else Library();
             } else Library();
         } else Library();
     }
