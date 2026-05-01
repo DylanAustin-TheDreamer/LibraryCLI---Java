@@ -9,6 +9,7 @@ import org.example.User.User;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 import static org.example.Database.DatabaseUtilities.saveUsers;
@@ -171,16 +172,23 @@ public class Application {
             case "1":
                 // code block
                 System.out.println("---");
+                System.out.println("Press x: Back");
                 System.out.println("Type the title and press enter...");
                 Scanner scannerTitle = new Scanner(System.in);
                 scannerInput = scannerTitle.nextLine();
                 String title = String.valueOf(scannerInput);
-                Book returnedBook = this.database.searchTitle(title);
-                System.out.println(returnedBook.getBookDetails());
+                Book returnedTitleBook = this.database.searchTitle(title);
+                if (Objects.equals(title, "x") || Objects.equals(title, "X")) {
+                    Library();
+                } else if (!Objects.equals(title, "x") || !Objects.equals(title, "X")) {
+                    if (returnedTitleBook == null) librarySearch("1");
+                }
+                System.out.println(returnedTitleBook.getBookDetails());
                 System.out.println(" ");
 
-                // This section below is not working - and it is the simplest code I have
-                if(!returnedBook.isLoaned()) {
+                // This section below is not working - and it is the simplest code I have - Edit: solved
+                // Needed this in both title search and index search lol!
+                if(!returnedTitleBook.isLoaned()) {
                     if (user != null) {
                         System.out.println("Press 1: Loan");
                     } else System.out.println("If you wish to loan, you must log in");
@@ -189,10 +197,10 @@ public class Application {
 
                 System.out.println("Press 2: Back to library");
                 scannerInput = scannerTitle.nextLine();
-                if (String.valueOf(scannerInput).equals("1")) {
+                if (String.valueOf(scannerInput).equals("1") && !returnedTitleBook.isLoaned()) {
                     if (user != null) {
                         System.out.println(" ");
-                        this.database.getSpecific(Integer.parseInt(String.valueOf(returnedBook.getIndex())), user.getName());
+                        this.database.setDatabaseBookToLoan(Integer.parseInt(String.valueOf(returnedTitleBook.getIndex())), user.getName());
                     } else this.Library();
                 } else {
                     this.Library();
@@ -202,23 +210,32 @@ public class Application {
                 // code block
                 System.out.println("---");
                 System.out.println("Index from 1 to " + books.getLast().getIndex());
+                System.out.println("Press x: Back");
                 System.out.println("Type the book ID index and press enter...");
                 Scanner scannerIndex = new Scanner(System.in);
                 scannerInput = scannerIndex.nextLine();
                 String convert = String.valueOf(scannerInput);
-                this.database.getSpecific(Integer.parseInt(convert), null);
+                Book returnedIndexBook = this.database.getSpecific(convert);
+                if (Objects.equals(convert, "x") || Objects.equals(convert, "X")) {
+                    Library();
+                } else if (!Objects.equals(convert, "x") || !Objects.equals(convert, "X")) {
+                    if (returnedIndexBook == null) librarySearch("2");
+                }
+                System.out.println(returnedIndexBook.getBookDetails());
                 System.out.println(" ");
-                if (user != null) {
-                    System.out.println("Press 1: Loan");
-                } else System.out.println("If you wish to loan, you must log in");
+                if(!returnedIndexBook.isLoaned()) {
+                    if (user != null) {
+                        System.out.println("Press 1: Loan");
+                    } else System.out.println("If you wish to loan, you must log in");
+                } else System.out.println("This book is already out on loan");
                 System.out.println("Press 2: Back to library");
                 scannerInput = scannerIndex.nextLine();
-                if (String.valueOf(scannerInput).equals("1")) {
+                if (String.valueOf(scannerInput).equals("1") && !returnedIndexBook.isLoaned()) {
                     if (user != null) {
                         System.out.println(" ");
-                        this.database.getSpecific(Integer.parseInt(convert), user.getName());
+                        this.database.setDatabaseBookToLoan(returnedIndexBook.getIndex(), user.getName());
                         try {
-                            updateExistingUsers(user.getName(), Integer.parseInt(convert));
+                            updateExistingUsers(user.getName(), returnedIndexBook.getIndex());
                         } catch (IOException | CsvException e){
                             throw new RuntimeException(e);
                         }

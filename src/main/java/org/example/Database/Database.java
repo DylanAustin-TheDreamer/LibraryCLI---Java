@@ -5,6 +5,7 @@ import org.example.User.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Database {
     private List<Book> book = new ArrayList<>();
@@ -19,19 +20,27 @@ public class Database {
     public void addToUserDatabase(User user){
         this.user.addLast(user);
     }
-    public void getSpecific(int index, String name){
-        if (name == null) {
-            for (Book book : this.book) {
-                if (index == book.getIndex()) {
-                    System.out.println(book.getBookDetails());
+    public Book getSpecific(String index){
+        if (!Objects.equals(index, "") || !Objects.equals(index, " ") || !Objects.equals(index, null)) {
+            try {
+                int bookIndex = Integer.parseInt(index);
+                for (Book book : this.book) {
+                    if (bookIndex == book.getIndex()) {
+                        return book;
+                    }
                 }
+            } catch (NumberFormatException e) {
+                System.out.println("No results found matching your terms");
+                return null;
             }
-        } else {
-            for (Book book : this.book) {
-                if (index == book.getIndex()) {
-                    book.setLoaned(name);
-                    System.out.println(book.getBookDetails());
-                }
+        }
+        return null;
+    }
+    public void setDatabaseBookToLoan(int index, String name){
+        for (Book book : this.book) {
+            if (index == book.getIndex()) {
+                book.setLoaned(name);
+                System.out.println(book.getBookDetails());
             }
         }
     }
